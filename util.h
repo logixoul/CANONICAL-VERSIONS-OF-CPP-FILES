@@ -73,6 +73,13 @@ private:
 enum nofill {};
 
 template<class T, class MemoryLayoutPolicy = XSequential>
+class Array2D;
+
+void copyCvtData(ci::Surface8u const& surface, Array2D<Vec3f> dst);
+void copyCvtData(ci::SurfaceT<float> const& surface, Array2D<Vec3f> dst);
+void copyCvtData(ci::SurfaceT<float> const& surface, Array2D<float> dst);
+
+template<class T, class MemoryLayoutPolicy = XSequential>
 struct Array2D
 {
 	T* data;
@@ -90,6 +97,12 @@ struct Array2D
 	Array2D(int dimension, T const& defaultValue = T()) : deleter(Init(dimension, dimension)) { fill(defaultValue); }
 	Array2D() : deleter(Init(0, 0)) { }
 	
+	template<class TSrc>
+	Array2D(ci::SurfaceT<TSrc> const& surface) : deleter(Init(surface.getWidth(), surface.getHeight()))
+	{
+		::copyCvtData(surface, *this);
+	}
+
 	T* begin() { return data; }
 	T* end() { return data+w*h; }
 	T const* begin() const { return data; }
