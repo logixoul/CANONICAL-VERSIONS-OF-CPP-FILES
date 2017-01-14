@@ -11,6 +11,6 @@ namespace cinder {
 // int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 // 		return mainFuncImpl(new SApp());
 // }
-void mainFuncImpl(cinder::app::AppBasic* app);
+int mainFuncImpl(cinder::app::AppBasic* app);
 
 #endif
