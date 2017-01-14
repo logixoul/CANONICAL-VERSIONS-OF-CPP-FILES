@@ -8,8 +8,8 @@ namespace cinder {
 }
 
 // usage:
-// int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR,int) {
-// 		mainFuncImpl(new SApp());
+// int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+// 		return mainFuncImpl(new SApp());
 // }
 void mainFuncImpl(cinder::app::AppBasic* app);
 
