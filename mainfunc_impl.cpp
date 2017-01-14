@@ -1,7 +1,8 @@
+#include "precompiled.h"
+#include "app.h"
 
-//CINDER_APP_BASIC(SApp, RendererGl)
-int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,int nCmdShow) {	
-	try{
+void mainFuncImpl(cinder::app::AppBasic* app) {
+	try {
 		createConsole();
 		cinder::app::AppBasic::prepareLaunch();														
 		cinder::app::AppBasic *app = new SApp;														
@@ -11,10 +12,6 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,i
 		return 0;																					
 	}catch(ci::gl::GlslProgCompileExc const& e) {
 		cout << "caught: " << endl << e.what() << endl;
-		//int dummy;cin>>dummy;
 		system("pause");
-
-
-
 	}
 }
