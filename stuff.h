@@ -402,6 +402,32 @@ void aaPoint_i(Array2D<T>& dst, int x, int y, T value)
 {
 	dst.wr(x, y) += value;
 }
+/// BEGIN CODE FOR BACKWARD COMPATIBILITY
+
+	template<class T>
+	void aaPoint_wrapZeros(Array2D<T>& dst, Vec2f p, T value)
+	{
+		aaPoint_wrapZeros(dst, p.x, p.y, value);
+	}
+	template<class T>
+	void aaPoint_wrapZeros(Array2D<T>& dst, float x, float y, T value)
+	{
+		int ix = x, iy = y;
+		float fx = ix, fy = iy;
+		if(x < 0.0f && fx != x) { fx--; ix--; }
+		if(y < 0.0f && fy != y) { fy--; iy--; }
+		float fractx = x - fx;
+		float fracty = y - fy;
+		float fractx1 = 1.0 - fractx;
+		float fracty1 = 1.0 - fracty;
+		get_wrapZeros(dst, ix, iy) += (fractx1 * fracty1) * value;
+		get_wrapZeros(dst, ix, iy+1) += (fractx1 * fracty) * value;
+		get_wrapZeros(dst, ix+1, iy) += (fractx * fracty1) * value;
+		get_wrapZeros(dst, ix+1, iy+1) += (fractx * fracty) * value;
+	}
+
+/// END CODE FOR BACKWARD COMPATIBILITY
+
 template<class T, class FetchFunc>
 void aaPoint(Array2D<T>& dst, Vec2f p, T value)
 {
