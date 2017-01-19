@@ -24,27 +24,6 @@ inline void clearconsole() {
     );
     SetConsoleCursorPosition(console, topLeft);
 }
-////////////////
-#if 0
-template<class Func>
-struct ToBind
-{
-	/*function<Func> f;
-	ToBind(Func f) : f(f){
-	}*/
-};
-
-template<class Func>
-ToBind<Func> toBind(Func func) {
-	throw 0;
-	//return ToBind<Func>(func);
-}
-
-void test()
-{
-	toBind(powf);
-}
-#endif
 
 template<class F>
 struct Transformed {
