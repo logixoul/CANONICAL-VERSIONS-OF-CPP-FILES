@@ -790,7 +790,7 @@ inline vector<float> getGaussianKernel(int ksize) { // ksize must be odd
 	return result;
 }
 template<class T,class FetchFunc>
-Array2D<T> gaussianBlur(Array2D<T> src, int ksize) { // ksize must be odd. fastpath is for r%3==0.
+Array2D<T> gaussianBlur(Array2D<T> src, int ksize) { // ksize must be odd.
 	int r = ksize / 2;
 	
 	auto kernel = getGaussianKernel(ksize);
