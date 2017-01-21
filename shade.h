@@ -6,31 +6,6 @@
 void beginRTT(gl::Texture fbotex);
 void endRTT();
 
-template<class T>
-struct ListOf
-{
-	vector<T> data;
-	ListOf(T t)
-	{
-		data.push_back(t);
-	}
-	ListOf<T>& operator()(T t)
-	{
-		data.push_back(t);
-		return *this;
-	}
-	operator vector<T>()
-	{
-		return data;
-	}
-};
-
-template<class T>
-ListOf<T> list_of(T t)
-{
-	return ListOf<T>(t);
-}
-
 struct Str {
 	string s;
 	Str& operator<<(string s2) {

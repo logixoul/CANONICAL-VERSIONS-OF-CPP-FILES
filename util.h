@@ -257,3 +257,28 @@ namespace Stopwatch
 #define FOR(variable, from, to) for(int variable = from; variable <= to; variable++)
 
 void createConsole();
+
+template<class T>
+struct ListOf
+{
+	vector<T> data;
+	ListOf(T t)
+	{
+		data.push_back(t);
+	}
+	ListOf<T>& operator()(T t)
+	{
+		data.push_back(t);
+		return *this;
+	}
+	operator vector<T>()
+	{
+		return data;
+	}
+};
+
+template<class T>
+ListOf<T> list_of(T t)
+{
+	return ListOf<T>(t);
+}
