@@ -66,8 +66,7 @@ namespace gpuBlur2_4 {
 		globaldict["sqrtTwoPi"] = sqrt(twoPi);
 		string lib =
 			"float gauss(float f, float width) {"
-			"	float nfactor = 1.0 / (width * sqrtTwoPi);"
-			"	return nfactor * exp(-f*f/(width*width));"
+			"	return exp(-f*f/(width*width));"
 			"}";
 		string shader =
 			"	vec2 offset = vec2(GB2_offsetX, GB2_offsetY);"
@@ -85,6 +84,12 @@ namespace gpuBlur2_4 {
 			"	float w0=gauss(-fr, gaussW);"
 			"	float wP1=gauss(1.0-fr, gaussW);"
 			"	float wP2=gauss(2.0-fr, gaussW);"
+			"	float sum=wM2+wM1+w0+wP1+wP2;"
+			"	wM2/=sum;"
+			"	wM1/=sum;"
+			"	w0/=sum;"
+			"	wP1/=sum;"
+			"	wP2/=sum;"
 			"	_out = wM2*aM2 + wM1*aM1 + w0*a0 + wP1*aP1 + wP2*aP2;";
 		globaldict["GB2_offsetX"] = 1.0;
 		globaldict["GB2_offsetY"] = 0.0;
