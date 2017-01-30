@@ -6,10 +6,6 @@
 inline string esc_macro_helper(string s) { return s.substr(1, s.length()-2); }
 #define ESC_(s) esc_macro_helper(string(#s))
 
-using namespace ci;
-
-using namespace std;
-
 typedef unsigned char byte;
 
 struct XSequential { template<class TArray, class TCoord> static int offset(TArray const& array, TCoord x, TCoord y)

@@ -15,7 +15,7 @@
 #include <boost/foreach.hpp>
 #include <fftw3.h>
 #include <numeric>
+#include <tuple>
 #define foreach BOOST_FOREACH
 using namespace ci;
 using namespace std;
-using namespace ci::app;
