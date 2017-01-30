@@ -151,6 +151,7 @@ private:
 		std::fill(begin(), end(), value);
 	}
 	T* Init(int w, int h) {
+		// fftwf_malloc so we can use "new-array execute" fftw functions
 		auto data = (T*)fftwf_malloc(w * h * sizeof(T)); // data = new T[w * h]
 		Init(w, h, data);
 		return data;
