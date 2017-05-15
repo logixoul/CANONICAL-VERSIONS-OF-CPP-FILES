@@ -16,6 +16,7 @@
 #include <fftw3.h>
 #include <numeric>
 #include <tuple>
+#include <opencv2/imgproc.hpp>
 #define foreach BOOST_FOREACH
 using namespace ci;
 using namespace std;
