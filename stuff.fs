@@ -7,30 +7,21 @@ float getLPhotoshop(vec3 c) {
 	return dot(w, c);
 }
 float pi=3.14159265;
-vec3 hsv_to_rgb(float h, float s, float v)
+
+// https://web.archive.org/web/20161105155520/http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
+vec3 rgb2hsv(vec3 c)
 {
-	float c = v * s;
-	h = mod((h * 6.0), 6.0);
-	float x = c * (1.0 - abs(mod(h, 2.0) - 1.0));
-	vec3 color;
+    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
 
-	if (0.0 <= h && h < 1.0) {
-		color = vec3(c, x, 0.0);
-	} else if (1.0 <= h && h < 2.0) {
-		color = vec3(x, c, 0.0);
-	} else if (2.0 <= h && h < 3.0) {
-		color = vec3(0.0, c, x);
-	} else if (3.0 <= h && h < 4.0) {
-		color = vec3(0.0, x, c);
-	} else if (4.0 <= h && h < 5.0) {
-		color = vec3(x, 0.0, c);
-	} else if (5.0 <= h && h < 6.0) {
-		color = vec3(c, 0.0, x);
-	} else {
-		color = vec3(0.0, 0.0, 0.0);
-	}
-
-	color += v - c;
-
-	return color;
-};
+    float d = q.x - min(q.w, q.y);
+    float e = 1.0e-10;
+    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+vec3 hsv2rgb(vec3 c)
+{
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
