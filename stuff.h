@@ -947,14 +947,6 @@ inline Array2D<Vec2f> gradientForward(Array2D<float> a) {
 	});
 }
 
-inline Array2D<float> div(Array2D<Vec2f> a) {
-	return ::map(a, [&](Vec2i p) -> float {
-		auto dGx_dx = (a.wr(p.x + 1, p.y).x - a.wr(p.x - 1, p.y).x) / 2.0f;
-		auto dGy_dy = (a.wr(p.x, p.y + 1).y - a.wr(p.x, p.y - 1).y) / 2.0f;
-		return dGx_dx + dGy_dy;
-	});
-}
-
 inline Array2D<float> divBackward(Array2D<Vec2f> a) {
 	return ::map(a, [&](Vec2i p) -> float {
 		auto dGx_dx = (a.wr(p.x, p.y).x - a.wr(p.x - 1, p.y).x);
