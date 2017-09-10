@@ -936,3 +936,29 @@ private:
 
 Array2D<Vec3f> resize(Array2D<Vec3f> src, Vec2i dstSize, const ci::FilterBase &filter);
 Array2D<float> resize(Array2D<float> src, Vec2i dstSize, const ci::FilterBase &filter);
+
+
+inline Array2D<Vec2f> gradientForward(Array2D<float> a) {
+	return lxpp::map(a, [&](Vec2i p) -> Vec2f {
+		return Vec2f(
+			(a.wr(p.x + 1, p.y) - a.wr(p.x, p.y)) / 1.0f,
+			(a.wr(p.x, p.y + 1) - a.wr(p.x, p.y)) / 1.0f
+		);
+	});
+}
+
+inline Array2D<float> div(Array2D<Vec2f> a) {
+	return lxpp::map(a, [&](Vec2i p) -> float {
+		auto dGx_dx = (a.wr(p.x + 1, p.y).x - a.wr(p.x - 1, p.y).x) / 2.0f;
+		auto dGy_dy = (a.wr(p.x, p.y + 1).y - a.wr(p.x, p.y - 1).y) / 2.0f;
+		return dGx_dx + dGy_dy;
+	});
+}
+
+inline Array2D<float> divBackward(Array2D<Vec2f> a) {
+	return lxpp::map(a, [&](Vec2i p) -> float {
+		auto dGx_dx = (a.wr(p.x, p.y).x - a.wr(p.x - 1, p.y).x);
+		auto dGy_dy = (a.wr(p.x, p.y).y - a.wr(p.x, p.y - 1).y);
+		return dGx_dx + dGy_dy;
+	});
+}
