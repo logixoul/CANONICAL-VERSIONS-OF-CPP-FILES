@@ -14,6 +14,17 @@ inline gl::Texture get_gradients_tex(gl::Texture src) {
 		"	_out.xy=vec2(dx,dy);"
 		"}");
 }
+inline gl::Texture gradientForwardTex(gl::Texture src) {
+	return shade(list_of(src),
+		"void shade(){"
+		"	float srcHere=fetch1(tex,tc);"
+		"	float srcR=fetch1(tex,tc+tsize*vec2(1.0,0.0));"
+		"	float srcB=fetch1(tex,tc+tsize*vec2(0.0,1.0));"
+		"	float dx=(srcR-srcHere)/2.0;"
+		"	float dy=(srcB-srcHere)/2.0;"
+		"	_out.xy=vec2(dx,dy);"
+		"}");
+}
 inline gl::Texture baseshade2(vector<gl::Texture> texv, string src, ShadeOpts const& opts = ShadeOpts(), string lib = "")
 {
 	return shade(texv, (lib + "\n" + "void shade() {" + src + "}").c_str(), opts);
