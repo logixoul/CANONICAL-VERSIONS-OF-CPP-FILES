@@ -72,8 +72,8 @@ public:
 	optional<GLenum> _ifmt;
 	float _scaleX, _scaleY;
 };
-gl::Texture shade(vector<gl::Texture> texv, const char* fshader_constChar, ShadeOpts const& opts=ShadeOpts());
-inline gl::Texture shade(vector<gl::Texture> texv, const char* fshader_constChar, float resScale)
+gl::Texture shade(vector<gl::Texture> const& texv, const char* fshader_constChar, ShadeOpts const& opts=ShadeOpts());
+inline gl::Texture shade(vector<gl::Texture> const& texv, const char* fshader_constChar, float resScale)
 {
 	return shade(texv, fshader_constChar, ShadeOpts().scale(resScale));
 }
