@@ -20,4 +20,3 @@
 #define foreach BOOST_FOREACH
 using namespace ci;
 using namespace std;
-using namespace ci::app;
