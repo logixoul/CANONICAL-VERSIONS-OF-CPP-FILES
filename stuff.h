@@ -714,27 +714,6 @@ Array2D<Vec2f> get_gradients(Array2D<T> src)
 inline gl::Texture maketex(int w, int h, GLint internalFormat) {
 	gl::Texture::Format fmt; fmt.setInternalFormat(internalFormat); return gl::Texture(NULL, GL_RGBA, w, h, fmt);
 }
-inline gl::Texture maketex(Array2D<Vec3f> arr, GLint internalFormat) {
-	gl::Texture::Format fmt; fmt.setInternalFormat(internalFormat);
-	auto tex = gl::Texture(arr.w, arr.h, fmt);
-	tex.bind();
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, arr.w, arr.h, GL_RGB, GL_FLOAT, arr.data);
-	return tex;
-}
-inline gl::Texture maketex(Array2D<Vec2f> arr, GLint internalFormat) {
-	gl::Texture::Format fmt; fmt.setInternalFormat(internalFormat);
-	auto tex = gl::Texture(arr.w, arr.h, fmt);
-	tex.bind();
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, arr.w, arr.h, GL_RG, GL_FLOAT, arr.data);
-	return tex;
-}
-inline gl::Texture maketex(Array2D<float> arr, GLint internalFormat) {
-	gl::Texture::Format fmt; fmt.setInternalFormat(internalFormat);
-	auto tex = gl::Texture(arr.w, arr.h, fmt);
-	tex.bind();
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, arr.w, arr.h, GL_LUMINANCE, GL_FLOAT, arr.data);
-	return tex;
-}
 
 template<class T>
 Array2D<T> gettexdata(gl::Texture tex, GLenum format, GLenum type) {
