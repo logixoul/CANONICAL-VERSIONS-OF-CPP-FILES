@@ -21,8 +21,6 @@ void StefanApp::endFrame() {
 	sw::endFrame();
 	cfg1::print();
 	my_console::endFrame();
-	if(shouldDecreaseFramerate())
-		Sleep(50);
 }
 
 void StefanApp::keyDown(KeyEvent e) {

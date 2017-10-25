@@ -20,7 +20,6 @@ public:
 	/*override*/ void mouseUp(MouseEvent e);
 	virtual void stefanUpdate() = 0;
 	virtual void stefanDraw() = 0;
-	virtual bool shouldDecreaseFramerate() const = 0;
 
 	/*override*/ void draw();
 };
