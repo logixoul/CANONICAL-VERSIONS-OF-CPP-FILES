@@ -5,7 +5,6 @@
 class my_console {
 public:
 	static void beginFrame();
-	static void clr();
 	static void endFrame();
 	template<class T>
 	static void print(T value) {
@@ -28,4 +27,4 @@ QDebug& operator<<(QDebug& prev, T value) {
 	return prev;
 }
 
-extern QDebug qDebug();
+QDebug qDebug();
