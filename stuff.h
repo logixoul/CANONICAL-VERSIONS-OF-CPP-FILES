@@ -1,7 +1,7 @@
 #pragma once
 #include "precompiled.h"
 #include "util.h"
-#include "my_console.h"
+#include "qdebug.h"
 
 const GLenum hdrFormat = GL_RGBA16F;
 
@@ -912,3 +912,7 @@ inline Array2D<float> divBackward(Array2D<Vec2f> a) {
 		return dGx_dx + dGy_dy;
 	});
 }
+
+void disableGLClamps();
+
+void enableDenormalFlushToZero();
