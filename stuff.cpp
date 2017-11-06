@@ -1,5 +1,6 @@
 #include "precompiled.h"
 #include "stuff.h"
+#include "gpgpu.h"
 
 int denormal_check::num;
 
@@ -109,4 +110,11 @@ void draw(const gl::TextureRef &texture, const Rectf &dstRect, gl::GlslProgRef c
 		return;
 
 	draw(texture, texture->getBounds(), dstRect, glsl);
+}
+
+gl::TextureRef redToLuminance(gl::TextureRef const& in) {
+	return shade2(in,
+		"_out.rgb = vec3(fetch1());",
+		ShadeOpts().ifmt(GL_RGBA16F)
+	);
 }
