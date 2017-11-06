@@ -12,13 +12,15 @@ namespace stefanfw {
 
 	void beginFrame() {
 		ci::app::AppBase* app = ci::app::App::get();
-		::mouseX = app->getMousePos().x / (float)app->getWindowWidth();
-		::mouseY = app->getMousePos().y / (float)app->getWindowHeight();
 
 		sw::beginFrame();
 
 		wsx = app->getWindowWidth();
 		wsy = app->getWindowHeight();
+
+		auto relMousePos = app->getMousePos() - app->getWindowPos();
+		::mouseX = relMousePos.x / (float)wsx;
+		::mouseY = relMousePos.y / (float)wsy;
 	}
 
 	void endFrame() {
@@ -33,7 +35,6 @@ namespace stefanfw {
 		if(e.isControlDown()&&e.getCode()!=KeyEvent::KEY_LCTRL)
 		{
 			keys2[e.getChar()] = !keys2[e.getChar()];
-			return true;
 		}
 		return true;
 	}
