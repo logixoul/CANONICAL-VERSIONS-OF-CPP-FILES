@@ -186,7 +186,7 @@ gl::TextureRef shade(vector<gl::TextureRef> const& texv, const char* fshader_con
 	gl::pushMatrices();
 	{
 		gl::ScopedViewport sv(ivec2(), result->getSize());
-		gl::setMatricesWindow(result->getSize(), false);
+		gl::setMatricesWindow(result->getSize(), true);
 		::draw(tex0, result->getBounds(), shader);
 		gl::popMatrices();
 	}
