@@ -193,7 +193,5 @@ gl::TextureRef shade(vector<gl::TextureRef> const& texv, const char* fshader_con
 
 	endRTT();
 
-	glUseProgram(0);
-
 	return result;
 }
