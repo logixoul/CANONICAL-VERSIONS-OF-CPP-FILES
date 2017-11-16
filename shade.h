@@ -2,6 +2,7 @@
 
 #include "precompiled.h"
 #include "util.h"
+#include "TextureCache.h"
 
 void beginRTT(gl::TextureRef fbotex);
 void endRTT();
@@ -39,10 +40,10 @@ struct ShadeOpts
 	ShadeOpts& ifmt(GLenum val) { _ifmt=val; return *this; }
 	ShadeOpts& scale(float val) { _scaleX=val; _scaleY=val; return *this; }
 	ShadeOpts& scale(float valX, float valY) { _scaleX=valX; _scaleY=valY; return *this; }
-	//ShadeOpts& tex(gl::TextureRef val) { _texv.push_back(val); }
+	ShadeOpts& texCache(TextureCache* val) { _texCache = val; return *this; }
 	optional<GLenum> _ifmt;
 	float _scaleX, _scaleY;
-	//vector<gl::TextureRef> _texv;
+	optional<TextureCache*> _texCache;
 };
 
 gl::TextureRef shade(vector<gl::TextureRef> const& texv, const char* fshader_constChar, ShadeOpts const& opts=ShadeOpts());

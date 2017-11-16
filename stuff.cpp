@@ -91,7 +91,8 @@ void draw(const gl::TextureRef &texture, const Area &srcArea, const Rectf &dstRe
 
 	gl::ScopedVao vaoScp(ctx->getDrawTextureVao());
 	gl::ScopedBuffer vboScp(ctx->getDrawTextureVbo());
-	gl::ScopedTextureBind texBindScope(texture);
+	//gl::ScopedTextureBind texBindScope(texture);
+	texture->bind(); // faster than the above?
 
 	gl::ScopedGlslProg glslScp(glsl);
 	glsl->uniform("uTex0", 0);

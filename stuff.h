@@ -860,9 +860,10 @@ inline vector<Array2D<float> > split(Array2D<vec3> arr) {
 	return result;
 }
 inline void setWrapBlack(gl::TextureRef tex) {
-	tex->bind();
-	float black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, black);
+	// I think the border color is transparent black by default. It doesn't hurt that it is transparent.
+	//tex->bind();
+	//float black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	//glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, black);
 	tex->setWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
 }
 

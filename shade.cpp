@@ -171,9 +171,20 @@ gl::TextureRef shade(vector<gl::TextureRef> const& texv, const char* fshader_con
 		shader->uniform(samplerName(i) + "Size", vec2(texv[i]->getSize()));
 		shader->uniform("tsize"+samplerSuffix(i), vec2(1)/vec2(texv[i]->getSize()));
 	}
-	gl::Texture::Format fmt;
-	fmt.setInternalFormat(opts._ifmt.exists ? opts._ifmt.val : tex0->getInternalFormat());
-	gl::TextureRef result = gl::Texture::create(tex0->getWidth() * opts._scaleX, tex0->getHeight() * opts._scaleY, fmt);
+	gl::TextureRef result;
+	ivec2 resultSize(tex0->getWidth() * opts._scaleX, tex0->getHeight() * opts._scaleY);
+	GLenum ifmt = opts._ifmt.exists ? opts._ifmt.val : tex0->getInternalFormat();
+	if (opts._texCache.exists && opts._texCache.val != nullptr) {
+		TextureCacheKey key;
+		key.ifmt = ifmt;
+		key.size = resultSize;
+		result = opts._texCache.val->get(key);
+	} else {
+		gl::Texture::Format fmt;
+		fmt.setInternalFormat(ifmt);
+		result = gl::Texture::create(resultSize.x, resultSize.y, fmt);
+	}
+
 	beginRTT(result);
 	
 	gl::pushMatrices();
