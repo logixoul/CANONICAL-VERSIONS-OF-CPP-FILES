@@ -19,13 +19,6 @@ void endRTT()
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 
-gl::TextureRef Shade::run() {
-	auto opts = ShadeOpts().scale(_scaleX, _scaleY);
-	if(_ifmt.exists)
-		opts.ifmt(_ifmt.val);
-	return shade(_texv, _src.c_str(), opts);
-}
-
 std::map<string, float> globaldict;
 void globaldict_default(string s, float f) {
 	if(globaldict.find(s) == globaldict.end())

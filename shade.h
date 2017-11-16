@@ -44,34 +44,7 @@ struct ShadeOpts
 	float _scaleX, _scaleY;
 	//vector<gl::TextureRef> _texv;
 };
-//typedef ShadeOpts Shade;
-struct Shade
-{
-public:
-	Shade()
-	{
-		_scaleX = _scaleY = 1.0f;
-	}
-	Shade& src(string val) { _src = val; return *this; }
-	Shade& expr(string val) {
-		_src = "void shade() {";
-		_src += "_out = " + val + ";";
-		_src += "}";
-		return *this;
-	}
-	Shade& tex(gl::TextureRef val) { _texv.push_back(val); return *this; }
-	Shade& ifmt(GLenum val) { _ifmt=val; return *this; }
-	Shade& scale(float val) { _scaleX=val; _scaleY=val; return *this; }
-	Shade& scale(float valX, float valY) { _scaleX=valX; _scaleY=valY; return *this; }
-	Shade& operator()(gl::TextureRef val) { tex(val); return *this; }
 
-	gl::TextureRef run();
-
-	string _src;
-	vector<gl::TextureRef> _texv;
-	optional<GLenum> _ifmt;
-	float _scaleX, _scaleY;
-};
 gl::TextureRef shade(vector<gl::TextureRef> const& texv, const char* fshader_constChar, ShadeOpts const& opts=ShadeOpts());
 inline gl::TextureRef shade(vector<gl::TextureRef> const& texv, const char* fshader_constChar, float resScale)
 {
