@@ -19,6 +19,15 @@ void endRTT()
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 
+static void drawRect() {
+	auto ctx = gl::context();
+
+	ctx->getDrawTextureVao()->bind();
+	//ctx->getDrawTextureVbo()->bind(); // this seems to be unnecessary
+
+	ctx->drawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
 std::map<string, float> globaldict;
 void globaldict_default(string s, float f) {
 	if(globaldict.find(s) == globaldict.end())
@@ -58,6 +67,7 @@ std::string getCompleteFshader(vector<gl::TextureRef> const& texv, std::string c
 		<< uniformDeclarations
 		<< "vec3 _out = vec3(0.0);"
 		<< "in vec2 tc;"
+		<< "out vec4 OUTPUT;"
 		<< "uniform vec2 mouse;"
 		<< "vec4 fetch4(sampler2D tex_, vec2 tc_) {"
 		<< "	return texture2D(tex_, tc_).rgba;"
@@ -102,9 +112,9 @@ std::string getCompleteFshader(vector<gl::TextureRef> const& texv, std::string c
 		Str()
 		<< "void main()"
 		<< "{"
-		<< "	gl_FragColor.a = 1.0;"
+		<< "	OUTPUT.a = 1.0;"
 		<< "	shade();"
-		<< "	gl_FragColor.rgb = _out;"
+		<< "	OUTPUT.rgb = _out;"
 		<< "}";
 	return intro + fshader + outro;
 }
@@ -123,17 +133,15 @@ gl::TextureRef shade(vector<gl::TextureRef> const& texv, const char* fshader_con
 				.vertex(
 					Str()
 					<< "#version 150"
-					<< "uniform mat4 ciModelViewProjection;"
 					<< "in vec4 ciPosition;"
-					<< "uniform vec2 uPositionOffset, uPositionScale;"
-					<< "uniform vec2 uTexCoordOffset, uTexCoordScale;"
 					<< "in vec2 ciTexCoord0;"
 					<< "out highp vec2 tc;"
 
 					<< "void main()"
 					<< "{"
-					<< "	gl_Position = ciModelViewProjection * ( vec4( uPositionOffset, 0, 0 ) + vec4( uPositionScale, 1, 1 ) * ciPosition );"
-					<< "	tc=uTexCoordOffset + uTexCoordScale * ciTexCoord0;"
+					<< "	gl_Position = ciPosition * 2 - 1;"
+					<< "	gl_Position.y = -gl_Position.y;"
+					<< "	tc = vec2(0.0, 1.0) + vec2(1.0, -1.0) * ciTexCoord0;"
 					<< "}")
 				.fragment(completeFshader)
 				.attribLocation("ciPosition", 0)
@@ -163,7 +171,6 @@ gl::TextureRef shade(vector<gl::TextureRef> const& texv, const char* fshader_con
 	{
 		shader->uniform(p.first, p.second);
 	}
-	
 	FOR(i, 1, texv.size()-1) {
 		//shader.
 		//string index = texIndex(texv[i]);
@@ -190,8 +197,8 @@ gl::TextureRef shade(vector<gl::TextureRef> const& texv, const char* fshader_con
 	gl::pushMatrices();
 	{
 		gl::ScopedViewport sv(ivec2(), result->getSize());
-		gl::setMatricesWindow(result->getSize(), true);
-		::draw(tex0, result->getBounds(), shader);
+		gl::setMatricesWindow(ivec2(1, 1), true);
+		::drawRect();
 		gl::popMatrices();
 	}
 

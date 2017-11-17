@@ -11,6 +11,7 @@
 namespace gpuBlur2_5 {
 
 	static TextureCache zoomstateCache;
+	static TextureCache upscaleCache;
 
 	gl::TextureRef run(gl::TextureRef src, int lvls) {
 		auto state = shade2(src, "_out = fetch3();");
@@ -33,11 +34,11 @@ namespace gpuBlur2_5 {
 		foreach(float& w, weights) {
 			w /= sumw;
 		}
-		cout << "Weights: ";
+		/*cout << "Weights: ";
 		foreach(float w, weights) {
 			cout << w << ", ";
 		}
-		cout << "\n";
+		cout << "\n";*/
 		vector<gl::TextureRef> zoomstates;
 		zoomstates.push_back(src);
 		globaldict["_mul"] = 1.0 / sumw;
@@ -49,7 +50,7 @@ namespace gpuBlur2_5 {
 			if (newZoomstate->getWidth() < 1 || newZoomstate->getHeight() < 1) throw runtime_error("too many blur levels");
 		}
 		for (int i = lvls - 1; i > 0; i--) {
-			auto upscaled = upscale(zoomstates[i], zoomstates[i-1]->getSize());
+			auto upscaled = upscale(zoomstates[i], zoomstates[i-1]->getSize(), &upscaleCache);
 			globaldict["_mul"] = lvlmul;// weights[i];
 			zoomstates[i-1] = shade2(zoomstates[i-1], upscaled,
 				"vec3 acc = fetch3(tex);"

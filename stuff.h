@@ -918,10 +918,6 @@ void disableGLReadClamp();
 
 void enableDenormalFlushToZero();
 
-void draw(const gl::TextureRef &texture, const Area &srcArea, const Rectf &dstRect, gl::GlslProgRef const& glsl);
-
-void draw(const gl::TextureRef &texture, const Rectf &dstRect, gl::GlslProgRef const& glsl);
-
 template<class TVec>
 TVec safeNormalized(TVec const& vec) {
 	TVec::value_type len = length(vec);
