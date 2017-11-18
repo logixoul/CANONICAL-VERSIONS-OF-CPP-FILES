@@ -651,11 +651,9 @@ vec2 gradient_i(Array2D<T> src, ivec2 p)
 template<class T, class FetchFunc>
 vec2 gradient_i_nodiv(Array2D<T> src, ivec2 p)
 {
-	//if(p.x<1||p.y<1||p.x>=src.w-1||p.y>=src.h-1)
-	//	return vec2::zero();
-	vec2 gradient;
-	gradient.x = FetchFunc::fetch(src,p.x + 1, p.y) - FetchFunc::fetch(src, p.x - 1, p.y);
-	gradient.y = FetchFunc::fetch(src,p.x, p.y + 1) - FetchFunc::fetch(src, p.x, p.y - 1);
+	vec2 gradient(
+		FetchFunc::fetch(src,p.x + 1, p.y) - FetchFunc::fetch(src, p.x - 1, p.y),
+		FetchFunc::fetch(src,p.x, p.y + 1) - FetchFunc::fetch(src, p.x, p.y - 1));
 	return gradient;
 }
 template<class T, class FetchFunc>
@@ -675,10 +673,8 @@ Array2D<vec2> get_gradients(Array2D<T> src)
 		gradients(0, y) = gradient_i_nodiv<T, FetchFunc>(src2, ivec2(0, y));
 		gradients(src.w-1, y) = gradient_i_nodiv<T, FetchFunc>(src2, ivec2(src.w-1, y));
 	}
-	for(int x=1; x < src.w-1; x++)
-	{
-		for(int y=1; y < src.h-1; y++)
-		{
+	for (int y = 1; y < src.h - 1; y++) {
+		for(int x=1; x < src.w-1; x++) {
 			gradients(x, y) = gradient_i_nodiv<T, WrapModes::NoWrap>(src2, ivec2(x, y));
 		}
 	}
