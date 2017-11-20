@@ -936,7 +936,7 @@ TVec safeNormalized(TVec const& vec) {
 
 gl::TextureRef redToLuminance(gl::TextureRef const& in);
 
-inline float nan_to_num(float f) {
+inline float nan_to_num_(float f) {
 	if (isnan_(f)) {
 		return 0.0f;
 	}
@@ -945,7 +945,7 @@ inline float nan_to_num(float f) {
 
 template<class T>
 Array2D<T> nan_to_num(Array2D<T> arr) {
-	return ::map(arr, [&](Vec2i p) {
-		return ::apply(arr(p), ::nan_to_num);
+	return ::map(arr, [&](ivec2 p) {
+		return ::apply(arr(p), ::nan_to_num_);
 	});
 }

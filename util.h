@@ -140,7 +140,7 @@ struct Array2D
 	int xStep() const { return MemoryLayoutPolicy::offset(*this, 1, 0) - MemoryLayoutPolicy::offset(*this, 0, 0); }
 	int yStep() const { return MemoryLayoutPolicy::offset(*this, 0, 1) - MemoryLayoutPolicy::offset(*this, 0, 0); }
 
-	Array2D clone(){
+	Array2D clone() const {
 		Array2D result(Size());
 		std::copy(begin(), end(), result.begin());
 		return result;
@@ -188,6 +188,11 @@ void trapFP();
 template<class F> vec3 apply(vec3 const& v, F f)
 {
 	return vec3(f(v.x), f(v.y), f(v.z));
+}
+
+template<class F> vec3 apply(float val, F f)
+{
+	return f(val);
 }
 
 // todo rm this
