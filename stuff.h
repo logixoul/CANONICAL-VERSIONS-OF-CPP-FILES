@@ -935,3 +935,10 @@ TVec safeNormalized(TVec const& vec) {
 }
 
 gl::TextureRef redToLuminance(gl::TextureRef const& in);
+
+inline float nan_to_num(float f) {
+	if (isnan_(f)) {
+		return 0.0f;
+	}
+	return f;
+}
