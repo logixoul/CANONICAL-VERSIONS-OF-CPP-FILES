@@ -942,3 +942,10 @@ inline float nan_to_num(float f) {
 	}
 	return f;
 }
+
+template<class T>
+Array2D<T> nan_to_num(Array2D<T> arr) {
+	return ::map(arr, [&](Vec2i p) {
+		return ::apply(arr(p), ::nan_to_num);
+	});
+}
