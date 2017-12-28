@@ -473,7 +473,7 @@ T getBilinear(Array2D<T> src, vec2 p)
 inline gl::TextureRef gtex(Array2D<float> a)
 {
 	gl::Texture::Format fmt;
-	fmt.setInternalFormat(hdrFormat);
+	fmt.setInternalFormat(GL_R16F);
 	gl::TextureRef tex = gl::Texture2d::create(a.w, a.h, fmt);
 	tex->bind();
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, a.w, a.h, GL_RED, GL_FLOAT, a.data);
@@ -540,9 +540,9 @@ Array2D<T> gauss3(Array2D<T> src) {
 	Array2D<T> dst1(src.w, src.h);
 	Array2D<T> dst2(src.w, src.h);
 	forxy(dst1)
-		dst1(p) = .25f * (2 * get_clamped(src, p.x, p.y) + get_clamped(src, p.x-1, p.y) + get_clamped(src, p.x+1, p.y));
+		dst1(p) = .25f * (2.0f * get_clamped(src, p.x, p.y) + get_clamped(src, p.x-1, p.y) + get_clamped(src, p.x+1, p.y));
 	forxy(dst2)
-		dst2(p) = .25f * (2 * get_clamped(dst1, p.x, p.y) + get_clamped(dst1, p.x, p.y-1) + get_clamped(dst1, p.x, p.y+1));
+		dst2(p) = .25f * (2.0f * get_clamped(dst1, p.x, p.y) + get_clamped(dst1, p.x, p.y-1) + get_clamped(dst1, p.x, p.y+1));
 	return dst2;
 }
 
@@ -639,7 +639,7 @@ T const& get_wrapZeros(Array2D<T> const& src, int x, int y)
 	}
 	return src(x, y);
 }
-template<class T, class FetchFunc>
+template<class T, class FetchFunc = WrapModes::DefaultImpl>
 vec2 gradient_i(Array2D<T>& src, ivec2 const& p)
 {
 	//if(p.x<1||p.y<1||p.x>=src.w-1||p.y>=src.h-1)
