@@ -82,3 +82,12 @@ gl::TextureRef redToLuminance(gl::TextureRef const& in) {
 		ShadeOpts().ifmt(GL_RGBA16F)
 	);
 }
+
+void draw(gl::TextureRef const& tex, ci::Rectf const& bounds) {
+	gl::TextureRef tex2 = tex;
+	if (tex->getInternalFormat() == GL_R16F) {
+		tex2 = redToLuminance(tex);
+	}
+	tex2->setTopDown(true);
+	gl::draw(tex2, bounds);
+}

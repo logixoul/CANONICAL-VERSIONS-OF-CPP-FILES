@@ -67,13 +67,6 @@ struct WrapModes {
 			return ::getWrapped(src, x, y);
 		}
 	};
-	struct GetClamped {
-		template<class T>
-		static T& fetch(Array2D<T>& src, int x, int y)
-		{
-			return ::get_clamped(src, x, y);
-		}
-	};
 	struct Get_WrapZeros {
 		template<class T>
 		static T& fetch(Array2D<T>& src, int x, int y)
@@ -88,6 +81,13 @@ struct WrapModes {
 			return src(x, y);
 		}
 	};
+    struct GetClamped {
+        template<class T>
+        static T& fetch(Array2D<T>& src, int x, int y)
+        {
+            return ::get_clamped(src, x, y);
+        }
+    };
 	typedef GetWrapped DefaultImpl;
 };
 template<class T, class FetchFunc>
@@ -766,6 +766,7 @@ Array2D<T> separableConvolve(Array2D<T> src, vector<float>& kernel) {
 	
 	// vertical
 
+	auto runtime_fetch = FetchFunc::fetch<T>;
 	for(int y = 0; y < h; y++)
 	{
 		auto blurVert = [&](int x0, int x1) {
@@ -778,7 +779,7 @@ Array2D<T> separableConvolve(Array2D<T> src, vector<float>& kernel) {
 				T sum = zero;
 				for(int xadd = -r; xadd <= r; xadd++)
 				{
-					sum += kernel[xadd + r] * (FetchFunc::fetch<T>(src, x + xadd, y));
+					sum += kernel[xadd + r] * (runtime_fetch(src, x + xadd, y));
 				}
 				dst1(x, y) = sum;
 			}
@@ -810,7 +811,7 @@ Array2D<T> separableConvolve(Array2D<T> src, vector<float>& kernel) {
 				T sum = zero;
 				for(int yadd = -r; yadd <= r; yadd++)
 				{
-					sum += kernel[yadd + r] * FetchFunc::fetch<T>(dst1, x, y + yadd);
+					sum += kernel[yadd + r] * runtime_fetch(dst1, x, y + yadd);
 				}
 				dst2(x, y) = sum;
 			}
@@ -954,3 +955,7 @@ Array2D<T> nan_to_num(Array2D<T> arr) {
 		return ::apply(arr(p), ::nan_to_num_);
 	});
 }
+
+mat2 rotate(float angle);
+
+void draw(gl::TextureRef const& tex, ci::Rectf const& bounds);
