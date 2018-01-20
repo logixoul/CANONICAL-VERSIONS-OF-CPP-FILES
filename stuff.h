@@ -766,7 +766,6 @@ Array2D<T> separableConvolve(Array2D<T> src, vector<float>& kernel) {
 	
 	// vertical
 
-	auto runtime_fetch = FetchFunc::fetch<T>;
 	for(int y = 0; y < h; y++)
 	{
 		auto blurVert = [&](int x0, int x1) {
@@ -779,7 +778,7 @@ Array2D<T> separableConvolve(Array2D<T> src, vector<float>& kernel) {
 				T sum = zero;
 				for(int xadd = -r; xadd <= r; xadd++)
 				{
-					sum += kernel[xadd + r] * (runtime_fetch(src, x + xadd, y));
+					sum += kernel[xadd + r] * (FetchFunc::fetch<T>(src, x + xadd, y));
 				}
 				dst1(x, y) = sum;
 			}
@@ -811,7 +810,7 @@ Array2D<T> separableConvolve(Array2D<T> src, vector<float>& kernel) {
 				T sum = zero;
 				for(int yadd = -r; yadd <= r; yadd++)
 				{
-					sum += kernel[yadd + r] * runtime_fetch(dst1, x, y + yadd);
+					sum += kernel[yadd + r] * FetchFunc::fetch<T>(dst1, x, y + yadd);
 				}
 				dst2(x, y) = sum;
 			}
