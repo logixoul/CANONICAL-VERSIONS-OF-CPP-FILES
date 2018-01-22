@@ -4,7 +4,7 @@
 
 namespace gpuBlur2_5 {
 	gl::TextureRef run(gl::TextureRef src, int lvls);
-	gl::TextureRef run_longtail(gl::TextureRef src, int lvls, float lvlmul);
+	gl::TextureRef run_longtail(gl::TextureRef src, int lvls, float lvlmul, float hscale = .5f, float vscale = .5f);
 	float getGaussW();
 	float gauss(float f, float width);
 	gl::TextureRef upscale(gl::TextureRef src, ci::ivec2 toSize, TextureCache* textureCache = nullptr);

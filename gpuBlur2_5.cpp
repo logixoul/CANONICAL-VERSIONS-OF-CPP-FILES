@@ -23,7 +23,7 @@ namespace gpuBlur2_5 {
 		return state;
 	}
 	
-	gl::TextureRef run_longtail(gl::TextureRef src, int lvls, float lvlmul) {
+	gl::TextureRef run_longtail(gl::TextureRef src, int lvls, float lvlmul, float hscale, float vscale) {
 		vector<float> weights;
 		float sumw = 0.0f;
 		for (int i = 0; i < lvls; i++) {
@@ -45,7 +45,7 @@ namespace gpuBlur2_5 {
 		zoomstates[0] = shade2(zoomstates[0],
 			"_out = fetch3() * _mul;");
 		for (int i = 0; i < lvls; i++) {
-			auto newZoomstate = singleblur(zoomstates[i], .5, .5, &zoomstateCache);
+			auto newZoomstate = singleblur(zoomstates[i], hscale, vscale, &zoomstateCache);
 			zoomstates.push_back(newZoomstate);
 			if (newZoomstate->getWidth() < 1 || newZoomstate->getHeight() < 1) throw runtime_error("too many blur levels");
 		}
