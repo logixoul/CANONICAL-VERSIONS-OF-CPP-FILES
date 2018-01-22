@@ -318,3 +318,5 @@ template<class T>
 Array2D<T> zeros_like(Array2D<T> a) {
 	return Array2D<T>(a.Size(), ::zero<T>());
 }
+
+#define STRING(...) #__VA_ARGS__
