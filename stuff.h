@@ -504,6 +504,15 @@ inline gl::TextureRef gtex(Array2D<vec3> a)
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, a.w, a.h, GL_RGB, GL_FLOAT, a.data);
 	return tex;
 }
+inline gl::TextureRef gtex(Array2D<vec4> a)
+{
+	gl::Texture::Format fmt;
+	fmt.setInternalFormat(hdrFormat);
+	gl::TextureRef tex = gl::Texture2d::create(a.w, a.h, fmt);
+	tex->bind();
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, a.w, a.h, GL_RGBA, GL_FLOAT, a.data);
+	return tex;
+}
 inline Array2D<float> to01(Array2D<float> a) {
 	auto minn = *std::min_element(a.begin(), a.end());
 	auto maxx = *std::max_element(a.begin(), a.end());
