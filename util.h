@@ -98,11 +98,13 @@ struct Array2D
 		::copyCvtData(surface, *this);
 	}
 	
+#ifdef OPENCV_CORE_HPP
 	template<class TSrc>
 	Array2D(cv::Mat_<TSrc> const& mat) : deleter(nullptr)
 	{
 		Init(mat.cols, mat.rows, (T*)mat.data);
 	}
+#endif
 
 	T* begin() { return data; }
 	T* end() { return data+w*h; }

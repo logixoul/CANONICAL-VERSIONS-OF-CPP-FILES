@@ -60,46 +60,19 @@ float linearstep(float edge0, float edge1, float x)
 	return x;
 }
 
-// Program tested on Microsoft Visual Studio 2008 - Zahid Ghadialy
-// This program shows example of Getting Elapsed Time
-//#include <windows.h>
-#include <MMSystem.h>
-using namespace std;
-#pragma comment(lib, "winmm.lib")
 
-LARGE_INTEGER timerFreq_;
-LARGE_INTEGER counterAtStart_;
+static std::chrono::high_resolution_clock::time_point startTime;
+
 namespace Stopwatch
 {
 	void Start()
 	{
-	  QueryPerformanceFrequency(&timerFreq_);
-	  QueryPerformanceCounter(&counterAtStart_);
-	  TIMECAPS ptc;
-	  UINT cbtc = 8;
-	  MMRESULT result = timeGetDevCaps(&ptc, cbtc);
-	  if (result == TIMERR_NOERROR)
-	  {
-	  }
-	  else
-	  {
-		cout<<"result = TIMER ERROR"<<endl;
-	  }
+		startTime = std::chrono::high_resolution_clock::now();
 	}
 
 	double GetElapsedMilliseconds()
 	{
-	  if (timerFreq_.QuadPart == 0)
-	  {
-		return -1;
-	  }
-	  else
-	  {
-		LARGE_INTEGER c;
-		QueryPerformanceCounter(&c);
-		double elapsed = (c.QuadPart - counterAtStart_.QuadPart) * 1000 / (double)timerFreq_.QuadPart;
-		return elapsed;
-	  }
+		return (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - startTime)).count();
 	}
 }
 
