@@ -16,7 +16,11 @@ inline gl::TextureRef get_gradients_tex(gl::TextureRef src) {
 		ShadeOpts().ifmt(GL_RG16F)
 		);
 }
-inline gl::TextureRef gradientForwardTex(gl::TextureRef src) {
+inline gl::TextureRef gradientForwardTex(gl::TextureRef src, GLuint wrap = GL_REPEAT) {
+	//src->setWrap(wrap, wrap);
+	src->bind();
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
 	return shade(list_of(src),
 		"void shade(){"
 		"	float srcHere=fetch1(tex,tc);"
@@ -26,6 +30,23 @@ inline gl::TextureRef gradientForwardTex(gl::TextureRef src) {
 		"	float dy=(srcB-srcHere)/2.0;"
 		"	_out.xy=vec2(dx,dy);"
 		"}");
+}
+inline gl::TextureRef divBackwardTex(gl::TextureRef src, GLuint wrap = GL_REPEAT) {
+	//src->setWrap(wrap, wrap);
+	src->bind();
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
+	return shade(list_of(src),
+		"void shade(){"
+		"	vec2 srcHere=fetch2(tex,tc);"
+		"	vec2 srcL=fetch2(tex,tc-tsize*vec2(1.0,0.0));"
+		"	vec2 srcU=fetch2(tex,tc-tsize*vec2(0.0,1.0));"
+		"	float dx=(srcHere.x-srcL.x)/2.0;"
+		"	float dy=(srcHere.y-srcU.y)/2.0;"
+		"	_out.x = dx + dy;"
+		"}",
+		ShadeOpts().ifmt(GL_R16F)
+		);
 }
 inline gl::TextureRef baseshade2(vector<gl::TextureRef> texv, string src, ShadeOpts const& opts = ShadeOpts(), string lib = "")
 {

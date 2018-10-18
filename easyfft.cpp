@@ -8,7 +8,7 @@ public:
 		if(cache.find(key) == cache.end()) {
 			Array2D<fftwf_complex> in(arrSize, nofill());
 			Array2D<fftwf_complex> out(arrSize, nofill());
-			auto plan = fftwf_plan_dft_2d(arrSize.y, arrSize.x, in.data, out.data, FFTW_FORWARD, flags);
+			auto plan = fftwf_plan_dft_2d(arrSize.y, arrSize.x, in.data, out.data, direction, flags);
 			cache[key] = plan;
 			return plan;
 		}
