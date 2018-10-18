@@ -169,7 +169,7 @@ void blurFaster_helper1d(Array2D<T>& arr, int r, ivec2 startXY, ivec2 endXY, ive
 	
 	// init sum
 	T sum=zero;
-	foreach(auto& entry, buffer)
+	for(auto& entry: buffer)
 	{
 		sum += entry.val;
 	}
@@ -762,6 +762,7 @@ float sigmaFromKsize(float ksize);
 
 float ksizeFromSigma(float sigma);
 
+// KS means it has ksize and sigma args
 template<class T,class FetchFunc>
 Array2D<T> separableConvolve(Array2D<T> src, vector<float>& kernel) {
 	int ksize = kernel.size();
@@ -882,10 +883,12 @@ inline vector<Array2D<float> > split(Array2D<vec3> arr) {
 }
 inline void setWrapBlack(gl::TextureRef tex) {
 	// I think the border color is transparent black by default. It doesn't hurt that it is transparent.
-	//tex->bind();
+	tex->bind();
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	//float black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	//glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, black);
-	tex->setWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
+	//tex->setWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
 }
 
 inline Array2D<vec3> merge(vector<Array2D<float> > channels) {
