@@ -967,6 +967,15 @@ Array2D<T> nan_to_num(Array2D<T> arr) {
 	});
 }
 
+inline unsigned int ilog2 (unsigned int val) {
+    unsigned int ret = -1;
+    while (val != 0) {
+        val >>= 1;
+        ret++;
+    }
+    return ret;
+}
+
 mat2 rotate(float angle);
 
 void draw(gl::TextureRef const& tex, ci::Rectf const& bounds);
