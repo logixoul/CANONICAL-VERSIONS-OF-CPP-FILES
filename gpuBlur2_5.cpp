@@ -31,11 +31,11 @@ namespace gpuBlur2_5 {
 			weights.push_back(w);
 			sumw += w;
 		}
-		foreach(float& w, weights) {
+		for(float& w: weights) {
 			w /= sumw;
 		}
 		/*cout << "Weights: ";
-		foreach(float w, weights) {
+		for(float w: weights) {
 			cout << w << ", ";
 		}
 		cout << "\n";*/

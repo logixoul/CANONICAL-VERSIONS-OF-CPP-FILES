@@ -32,7 +32,7 @@ namespace gpuBlur2_4 {
 			weights.push_back(w);
 			sumw += w;
 		}
-		foreach(float& w, weights) {
+		for(float& w: weights) {
 			w /= sumw;
 		}
 		for(int i = 0; i < lvls; i++) {
