@@ -722,6 +722,27 @@ Array2D<T> gettexdata(gl::TextureRef tex, GLenum format, GLenum type) {
 	return gettexdata<T>(tex, format, type, tex->getBounds());
 }
 
+template<class T>
+Array2D<T> dl(gl::TextureRef tex) {
+	return dl<T>(tex, format, type, tex->getBounds());
+}
+
+template<> Array2D<float> dl<float>(gl::TextureRef tex) {
+	return gettexdata<float>(tex, GL_RED, GL_FLOAT);
+}
+
+template<> Array2D<vec2> dl<vec2>(gl::TextureRef tex) {
+	return gettexdata<vec2>(tex, GL_RG, GL_FLOAT);
+}
+
+template<> Array2D<vec3> dl<vec3>(gl::TextureRef tex) {
+	return gettexdata<vec3>(tex, GL_RGB, GL_FLOAT);
+}
+
+template<> Array2D<vec4> dl<vec4>(gl::TextureRef tex) {
+	return gettexdata<vec4>(tex, GL_RGBA, GL_FLOAT);
+}
+
 inline void checkGLError(string place)
 {
 	GLenum errCode;
@@ -891,6 +912,13 @@ inline void setWrapBlack(gl::TextureRef tex) {
 	//tex->setWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
 }
 
+inline void setWrap(gl::TextureRef tex, GLenum wrap) {
+	// I think the border color is transparent black by default. It doesn't hurt that it is transparent.
+	tex->bind();
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
+}
+
 inline Array2D<vec3> merge(vector<Array2D<float> > channels) {
 	Array2D<float>& r = channels[0];
 	Array2D<float>& g = channels[1];
@@ -974,6 +1002,15 @@ inline unsigned int ilog2 (unsigned int val) {
         ret++;
     }
     return ret;
+}
+
+inline vec2 compdiv(vec2 const& v1, vec2 const& v2) {
+	float a = v1.x, b = v1.y;
+	float c = v2.x, d = v2.y;
+	float cd = sq(c) + sq(d);
+	return vec2(
+		(a*c + b*d) / cd,
+		(b*c - a*d) / cd);
 }
 
 mat2 rotate(float angle);
