@@ -3,6 +3,7 @@
 #include "util.h"
 #include "qdebug.h"
 #include "TextureCache.h"
+#include "shade.h"
 
 const GLenum hdrFormat = GL_RGBA16F;
 
@@ -727,19 +728,19 @@ Array2D<T> dl(gl::TextureRef tex) {
 	return dl<T>(tex, format, type, tex->getBounds());
 }
 
-template<> Array2D<float> dl<float>(gl::TextureRef tex) {
+template<> inline Array2D<float> dl<float>(gl::TextureRef tex) {
 	return gettexdata<float>(tex, GL_RED, GL_FLOAT);
 }
 
-template<> Array2D<vec2> dl<vec2>(gl::TextureRef tex) {
+template<> inline Array2D<vec2> dl<vec2>(gl::TextureRef tex) {
 	return gettexdata<vec2>(tex, GL_RG, GL_FLOAT);
 }
 
-template<> Array2D<vec3> dl<vec3>(gl::TextureRef tex) {
+template<> inline Array2D<vec3> dl<vec3>(gl::TextureRef tex) {
 	return gettexdata<vec3>(tex, GL_RGB, GL_FLOAT);
 }
 
-template<> Array2D<vec4> dl<vec4>(gl::TextureRef tex) {
+template<> inline Array2D<vec4> dl<vec4>(gl::TextureRef tex) {
 	return gettexdata<vec4>(tex, GL_RGBA, GL_FLOAT);
 }
 
