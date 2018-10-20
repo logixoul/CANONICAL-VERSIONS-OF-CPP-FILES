@@ -2,7 +2,11 @@
 #include "precompiled.h"
 #include "shade.h"
 
-inline gl::TextureRef get_gradients_tex(gl::TextureRef src) {
+inline gl::TextureRef get_gradients_tex(gl::TextureRef src, GLuint wrap = GL_REPEAT) {
+	GPU_SCOPE("get_gradients_tex");
+	src->bind();
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
 	return shade(list_of(src),
 		"void shade(){"
 		"	float srcL=fetch1(tex,tc+tsize*vec2(-1.0,0.0));"
@@ -17,6 +21,7 @@ inline gl::TextureRef get_gradients_tex(gl::TextureRef src) {
 		);
 }
 inline gl::TextureRef gradientForwardTex(gl::TextureRef src, GLuint wrap = GL_REPEAT) {
+	GPU_SCOPE("gradientForwardTex");
 	//src->setWrap(wrap, wrap);
 	src->bind();
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
@@ -29,9 +34,11 @@ inline gl::TextureRef gradientForwardTex(gl::TextureRef src, GLuint wrap = GL_RE
 		"	float dx=(srcR-srcHere)/2.0;"
 		"	float dy=(srcB-srcHere)/2.0;"
 		"	_out.xy=vec2(dx,dy);"
-		"}");
+		"}"
+		, ShadeOpts().ifmt(GL_RG16F));
 }
 inline gl::TextureRef divBackwardTex(gl::TextureRef src, GLuint wrap = GL_REPEAT) {
+	GPU_SCOPE("divBackwardTex");
 	//src->setWrap(wrap, wrap);
 	src->bind();
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);

@@ -57,7 +57,7 @@ std::string getCompleteFshader(vector<gl::TextureRef> const& texv, std::string c
 		uniformDeclarations += "uniform vec2 " + samplerName(i) + "Size;\n";
 		uniformDeclarations += "uniform vec2 tsize" + samplerSuffix(i) + ";\n";
 	}
-	foreach(auto& p, globaldict)
+	for(auto& p: globaldict)
 	{
 		uniformDeclarations += "uniform float " + p.first + ";\n";
 	}
@@ -121,6 +121,10 @@ std::string getCompleteFshader(vector<gl::TextureRef> const& texv, std::string c
 
 gl::TextureRef shade(vector<gl::TextureRef> const& texv, const char* fshader_constChar, ShadeOpts const& opts)
 {
+	shared_ptr<GpuScope> gpuScope;
+	if (opts._scopeName != "") {
+		gpuScope = make_shared<GpuScope>(opts._scopeName);
+	}
 	const string fshader(fshader_constChar);
 
 	static std::map<string, gl::GlslProgRef> shaders;
@@ -167,7 +171,7 @@ gl::TextureRef shade(vector<gl::TextureRef> const& texv, const char* fshader_con
 	shader->uniform("tex", 0); tex0->bind(0);
 	shader->uniform("texSize", vec2(tex0->getSize()));
 	shader->uniform("tsize", vec2(1.0)/vec2(tex0->getSize()));
-	foreach(auto& p, globaldict)
+	for(auto& p: globaldict)
 	{
 		shader->uniform(p.first, p.second);
 	}

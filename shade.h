@@ -52,9 +52,11 @@ struct ShadeOpts
 	ShadeOpts& scale(float val) { _scaleX=val; _scaleY=val; return *this; }
 	ShadeOpts& scale(float valX, float valY) { _scaleX=valX; _scaleY=valY; return *this; }
 	ShadeOpts& texCache(TextureCache* val) { _texCache = val; return *this; }
+	ShadeOpts& scope(std::string name) { _scopeName = name; return *this; }
 	optional<GLenum> _ifmt;
 	float _scaleX, _scaleY;
 	TextureCache* _texCache = nullptr;
+	std::string _scopeName;
 };
 
 gl::TextureRef shade(vector<gl::TextureRef> const& texv, const char* fshader_constChar, ShadeOpts const& opts=ShadeOpts());
