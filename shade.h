@@ -4,6 +4,17 @@
 #include "util.h"
 #include "TextureCache.h"
 
+struct GpuScope {
+	GpuScope(string name) {
+		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, name.c_str());
+	}
+	~GpuScope() {
+		glPopDebugGroup();
+	}
+};
+
+#define GPU_SCOPE(name) GpuScope gpuScope_ ## __LINE__  (name);
+
 void beginRTT(gl::TextureRef fbotex);
 void endRTT();
 

@@ -92,8 +92,17 @@ struct Array2D
 	Array2D(int dimension, T const& defaultValue = T()) : deleter(Init(dimension, dimension)) { fill(defaultValue); }
 	Array2D() : deleter(Init(0, 0)) { }
 	
-	template<class TSrc>
-	Array2D(TSrc const& surface) : deleter(Init(surface.getWidth(), surface.getHeight()))
+	Array2D(ci::Surface8u const& surface) : deleter(Init(surface.getWidth(), surface.getHeight()))
+	{
+		::copyCvtData(surface, *this);
+	}
+
+	Array2D(ci::SurfaceT<float> const& surface) : deleter(Init(surface.getWidth(), surface.getHeight()))
+	{
+		::copyCvtData(surface, *this);
+	}
+
+	Array2D(ci::ChannelT<float> const& surface) : deleter(Init(surface.getWidth(), surface.getHeight()))
 	{
 		::copyCvtData(surface, *this);
 	}
