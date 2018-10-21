@@ -477,13 +477,15 @@ T getBilinear(Array2D<T> src, vec2 p)
 {
 	return getBilinear<T, WrapModes::DefaultImpl>(src, p);
 }
-
+inline void bind(gl::TextureRef& tex) {
+	glBindTexture(tex->getTarget(), tex->getId());
+}
 inline gl::TextureRef gtex(Array2D<float> a)
 {
 	gl::Texture::Format fmt;
 	fmt.setInternalFormat(GL_R16F);
 	gl::TextureRef tex = gl::Texture2d::create(a.w, a.h, fmt);
-	tex->bind();
+	bind(tex);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, a.w, a.h, GL_RED, GL_FLOAT, a.data);
 	return tex;
 }
@@ -492,7 +494,7 @@ inline gl::TextureRef gtex(Array2D<vec2> a)
 	gl::Texture::Format fmt;
 	fmt.setInternalFormat(hdrFormat);
 	gl::TextureRef tex = gl::Texture2d::create(a.w, a.h, fmt);
-	tex->bind();
+	bind(tex);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, a.w, a.h, GL_RG, GL_FLOAT, a.data);
 	return tex;
 }
@@ -501,7 +503,7 @@ inline gl::TextureRef gtex(Array2D<vec3> a)
 	gl::Texture::Format fmt;
 	fmt.setInternalFormat(hdrFormat);
 	gl::TextureRef tex = gl::Texture2d::create(a.w, a.h, fmt);
-	tex->bind();
+	bind(tex);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, a.w, a.h, GL_RGB, GL_FLOAT, a.data);
 	return tex;
 }
@@ -510,7 +512,7 @@ inline gl::TextureRef gtex(Array2D<vec4> a)
 	gl::Texture::Format fmt;
 	fmt.setInternalFormat(hdrFormat);
 	gl::TextureRef tex = gl::Texture2d::create(a.w, a.h, fmt);
-	tex->bind();
+	bind(tex);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, a.w, a.h, GL_RGBA, GL_FLOAT, a.data);
 	return tex;
 }
