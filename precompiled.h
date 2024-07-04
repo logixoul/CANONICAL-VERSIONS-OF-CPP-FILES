@@ -4,7 +4,6 @@
 #include <string>
 #include <cinder/ip/Resize.h>
 #include <complex>
-#include <Windows.h> // for AllocConsole. See if it's still needed.
 // these two are from Windows.h
 #undef min
 #undef max
@@ -16,11 +15,11 @@
 #include <cinder/gl/gl.h>
 #include <cinder/ImageIo.h>
 #include <cinder/Vector.h>
-#include <cinder/Rand.h>
-#include <boost/foreach.hpp>
+
+
 #include <float.h>
 #include <fftw3.h>
-#include <numeric>
+
 #include <tuple>
 #include <opencv2/imgproc.hpp>
 #include <thread>
