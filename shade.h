@@ -70,6 +70,9 @@ template<> inline string typeToString<int>() {
 template<> inline string typeToString<ivec2>() {
 	return "ivec2";
 }
+template<> inline string typeToString<bool>() {
+	return "bool";
+}
 struct ShadeOpts
 {
 	ShadeOpts();
@@ -94,6 +97,7 @@ struct ShadeOpts
 			[val, name](gl::GlslProgRef prog) { prog->uniform(name, val); },
 			typeToString<T>() + " " + name
 			});
+		//cout << typeToString<T>() + " " + name << endl;
 		return *this;
 	}
 	ShadeOpts& vshaderExtra(string val) {
