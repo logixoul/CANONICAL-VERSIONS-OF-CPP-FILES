@@ -48,8 +48,9 @@ struct Str {
 };
 
 struct Uniform {
-	function<void(gl::GlslProgRef)> setter;
+	function<void(int)> setter;
 	string shortDecl;
+	string name;
 };
 
 template<class T>
@@ -69,6 +70,9 @@ template<> inline string typeToString<int>() {
 }
 template<> inline string typeToString<ivec2>() {
 	return "ivec2";
+}
+template<> inline string typeToString<vec2>() {
+	return "vec2";
 }
 template<> inline string typeToString<bool>() {
 	return "bool";
@@ -92,12 +96,16 @@ struct ShadeOpts
 		_enableResult = val; return *this;
 	}
 	template<class T>
-	ShadeOpts& uniform(string name, T val) {
+	ShadeOpts& uniform(string name, T val, std::string typeName = "") {
+		if (typeName == "")
+			typeName = typeToString<T>();
 		_uniforms.push_back(Uniform{
-			[val, name](gl::GlslProgRef prog) { prog->uniform(name, val); },
-			typeToString<T>() + " " + name
+			[val](int location) {
+				ShadeOpts::setUniform(location, val);
+			},
+			typeName + " " + name,
+			name
 			});
-		//cout << typeToString<T>() + " " + name << endl;
 		return *this;
 	}
 	ShadeOpts& vshaderExtra(string val) {
@@ -116,6 +124,12 @@ struct ShadeOpts
 	bool _enableResult = true;
 	vector<Uniform> _uniforms;
 	string _vshaderExtra;
+
+private:
+	static void setUniform(int location, float const& val);
+	static void setUniform(int location, vec2 const& val);
+	static void setUniform(int location, ivec2 const& val);
+	static void setUniform(int location, int const& val);
 };
 
 gl::TextureRef shade(vector<gl::TextureRef> const& texv, std::string const& fshader, ShadeOpts const& opts=ShadeOpts());

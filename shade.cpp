@@ -79,47 +79,37 @@ auto samplerName = [&](int i) -> string {
 	return "tex" + samplerSuffix(i);
 };
 
-std::string getCompleteFshader(vector<gl::TextureRef> const& texv, vector<Uniform> const& uniforms, std::string const& fshader, string* uniformDeclarationsRet) {
-	auto texIndex = [&](gl::TextureRef t) {
-		return std::to_string(
-			1 + (std::find(texv.begin(), texv.end(), t) - texv.begin())
-			);
-	};
+std::string samplerTypeName(gl::TextureBaseRef tex) {
+	string name = "sampler2D";
+	GLenum fmt, type;
+	tex->getInternalFormatInfo(tex->getInternalFormat(), &fmt, &type);
+	if (type == GL_UNSIGNED_INT) name = "usampler2D";
+	return name;
+}
+
+std::string getUniformDeclarations(ShadeOpts const& opts) {
 	stringstream uniformDeclarations;
 	int location = 0;
-	uniformDeclarations << "layout(location=" << location++ << ") uniform ivec2 viewportSize;\n";
-	uniformDeclarations << "layout(location=" << location++ << ") uniform vec2 mouse;\n";
-	//uniformDeclarations << "layout(location=" << location++ << ") uniform vec2 resultSize;\n";
-	//uniformDeclarations << "vec2 my_FragCoord;\n";
-	for(int i = 0; i < texv.size(); i++)
-	{
-		string samplerType = "sampler2D";
-		GLenum fmt, type;
-		texv[i]->getInternalFormatInfo(texv[i]->getInternalFormat(), &fmt, &type);
-		if (type == GL_UNSIGNED_INT) samplerType = "usampler2D";
-		uniformDeclarations << "layout(location=" << location++ << ") uniform " + samplerType + " " + samplerName(i) + ";\n";
-		uniformDeclarations << "layout(location=" << location++ << ") uniform vec2 " + samplerName(i) + "Size;\n";
-		uniformDeclarations << "layout(location=" << location++ << ") uniform vec2 tsize" + samplerSuffix(i) + ";\n";
-	}
-	for (auto& p : uniforms)
+	for (auto& p : opts._uniforms)
 	{
 		uniformDeclarations << "layout(location=" << location++ << ") uniform " + p.shortDecl + ";\n";
 	}
 	//uniformDeclarations << "layout(binding=0, r32f) uniform coherent image2D image;";
-	*uniformDeclarationsRet = uniformDeclarations.str();
+	return uniformDeclarations.str();
+}
+
+std::string getCompleteFshader(vector<gl::TextureRef> const& texv, vector<Uniform> const& uniforms, std::string const& fshader, string const& uniformDeclarations) {
 	string intro =
 		Str()
 		<< "#version 150"
 		<< "#extension GL_ARB_explicit_uniform_location : enable"
 		<< "#extension GL_ARB_texture_gather : enable"
 		//<< "#extension GL_ARB_shader_image_load_store : enable"
-		<< uniformDeclarations.str()
+		<< uniformDeclarations
 		<< "in vec2 tc;"
 		<< "in highp vec2 relOutTc;"
 		<< "/*precise*/ out vec4 _out;"
 		//<< "layout(origin_upper_left) in vec4 gl_FragCoord;"
-		;
-	intro += Str()
 		<< "vec4 fetch4(sampler2D tex_, vec2 tc_) {"
 		<< "	return texture2D(tex_, tc_).rgba;"
 		<< "}"
@@ -171,50 +161,66 @@ std::string getCompleteFshader(vector<gl::TextureRef> const& texv, vector<Unifor
 	return intro + fshader + outro;
 }
 
-// location++ breaks things on Intel
-/*void setUniform(int location, float val) {
-	glUniform1f(location, val);
-}
-
-void setUniform(int location, vec2 val) {
-	glUniform2f(location, val.x, val.y);
-}
-
-void setUniform(int location, ivec2 val) {
-	glUniform2i(location, val.x, val.y);
-}
-
-void setUniform(int location, int val) {
-	glUniform1i(location, val);
-}*/
-
-// avoid libcinder console warning for "uniform not found".
-// This warning happens a lot for me, because I
-// always send uniforms such as "mouse" and
-// "viewport", no matter if a given shader actually
-// uses them
-template<class TData>
-static void setUniform_noWarning(gl::GlslProgRef prog, std::string const& name, TData const& data) {
-	auto uniformLocation = prog->getUniformLocation(name);
-	if(uniformLocation != -1)
-		prog->uniform(uniformLocation, data);
-}
-
-gl::TextureRef shade(vector<gl::TextureRef> const& texv, std::string const& fshader, ShadeOpts const& opts)
+gl::TextureRef shade(vector<gl::TextureRef> const& texv, std::string const& fshader, ShadeOpts const& optsArg)
 {
+	ShadeOpts opts = optsArg; // local copy because arg is const
+	auto tex0 = texv[0];
+	ivec2 viewportSize(
+		floor(tex0->getWidth() * opts._scaleX),
+		floor(tex0->getHeight() * opts._scaleY)
+	);
+
+	if (opts._dstRectSize != ivec2()) {
+		viewportSize = opts._dstRectSize;
+	}
+	opts.uniform("viewportSize", viewportSize);
+	opts.uniform("mouse", vec2(mouseX, mouseY));
+	opts.uniform("tex", 0, samplerTypeName(tex0));
+	opts.uniform("texSize", vec2(tex0->getSize()));
+	opts.uniform("tsize", vec2(1.0) / vec2(tex0->getSize()));
+	for (int i = 1; i < texv.size(); i++) {
+		opts.uniform(samplerName(i), i, samplerTypeName(texv[i]));
+		opts.uniform(samplerName(i) + "Size", vec2(texv[i]->getSize()));
+		opts.uniform("tsize" + samplerSuffix(i), vec2(1) / vec2(texv[i]->getSize()));
+	}
+	auto srcArea = opts._area;
+	if (srcArea == Area::zero()) {
+		srcArea = tex0->getBounds();
+	}
+	tex0->setTopDown(true);
+	Rectf texRect = tex0->getAreaTexCoords(srcArea);
+	tex0->setTopDown(false);
+
+	//cout << "sending problematic uniforms" << endl;
+	opts.uniform("uTexCoordOffset", texRect.getUpperLeft());
+	opts.uniform("uTexCoordScale", texRect.getSize());
+
+	vector<gl::TextureRef> results;
+	if (opts._enableResult) {
+		if (opts._targetTexs.size() != 0)
+		{
+			results = opts._targetTexs;
+		}
+		else {
+			GLenum ifmt = opts._ifmt.exists ? opts._ifmt.val : tex0->getInternalFormat();
+			results = { maketex(viewportSize.x, viewportSize.y, ifmt) };
+		}
+	}
+
 	shared_ptr<GpuScope> gpuScope;
 	if (opts._scopeName != "") {
 		gpuScope = make_shared<GpuScope>(opts._scopeName);
 	}
-	//const string fshader = "void shade() { }";
+	
 	static std::mutex mapMutex;
 	unique_lock<std::mutex> ul(mapMutex);
 	static std::map<string, gl::GlslProgRef> shaders;
 	gl::GlslProgRef shader;
 	if(shaders.find(fshader) == shaders.end())
 	{
-		string uniformDeclarations;
-		std::string completeFshader = getCompleteFshader(texv, opts._uniforms, fshader, &uniformDeclarations);
+		string uniformDeclarations = getUniformDeclarations(opts);
+		std::string completeFshader = getCompleteFshader(texv, opts._uniforms, fshader, uniformDeclarations);
+		//cout << "src:\n" << completeFshader << endl;
 		string completeVshader = Str()
 			<< "#version 150"
 			<< "#extension GL_ARB_explicit_uniform_location : enable"
@@ -224,7 +230,6 @@ gl::TextureRef shade(vector<gl::TextureRef> const& texv, std::string const& fsha
 			<< "layout(location=1) in vec2 ciTexCoord0;"
 			<< "out highp vec2 tc;"
 			<< "out highp vec2 relOutTc;" // relative out texcoord
-			<< "uniform vec2 uTexCoordOffset, uTexCoordScale;"
 			<< uniformDeclarations
 
 			<< "void main()"
@@ -252,68 +257,30 @@ gl::TextureRef shade(vector<gl::TextureRef> const& texv, std::string const& fsha
 	} else {
 		shader = shaders[fshader];
 	}
-	auto tex0 = texv[0];
 	auto prevGlslProg = gl::Context::getCurrent()->getGlslProg();
-	//glUseProgram(shader->getHandle());
 	//gl::Context::getCurrent()->bindGlslProg(shader);
 	glUseProgram(shader->getHandle());
-	ivec2 viewportSize(
-		floor(tex0->getWidth() * opts._scaleX),
-		floor(tex0->getHeight() * opts._scaleY)
-	);
-
-	if (opts._dstRectSize != ivec2()) {
-		viewportSize = opts._dstRectSize;
-	}
-	vector<gl::TextureRef> results;
-	if (opts._enableResult) {
-		if (opts._targetTexs.size() != 0)
-		{
-			results = opts._targetTexs;
-		}
-		else {
-			GLenum ifmt = opts._ifmt.exists ? opts._ifmt.val : tex0->getInternalFormat();
-			results = { maketex(viewportSize.x, viewportSize.y, ifmt) };
-		}
-	}
 	
+	for (int i = 0; i < texv.size(); i++) {
+		bindTexture(texv[i], GL_TEXTURE0 + i);
+	}
 	int location = 0;
-	//auto activeUniforms = shader->getActiveUniforms();
-	
-	setUniform_noWarning(shader, "viewportSize", viewportSize);
-	location++;
-	setUniform_noWarning(shader, "mouse", vec2(mouseX, mouseY));
-	//::setUniform(location++, vec2(result->getSize()));
-	setUniform_noWarning(shader, "tex", 0); bindTexture(tex0, GL_TEXTURE0 + 0);
-	setUniform_noWarning(shader, "texSize", vec2(tex0->getSize()));
-	setUniform_noWarning(shader, "tsize", vec2(1.0) / vec2(tex0->getSize()));
-	for (int i = 1; i < texv.size(); i++) {
-		//shader.
-		//string index = texIndex(texv[i]);
-		setUniform_noWarning(shader, samplerName(i), i); bindTexture(texv[i], GL_TEXTURE0 + i);
-		setUniform_noWarning(shader, samplerName(i)+"Size", vec2(texv[i]->getSize()));
-		setUniform_noWarning(shader, "tsize" + samplerSuffix(i), vec2(1)/vec2(texv[i]->getSize()));
-	}
 	for (auto& uniform : opts._uniforms)
 	{
-		uniform.setter(shader);
+		//cout << "location " << location << endl;
+		//cout << "decl " << uniform.shortDecl << endl;
+		// doing this check to avoid an OpenGL error
+		if(glGetUniformLocation(shader->getHandle(), uniform.name.c_str()) != -1)
+			uniform.setter(location);
+		location++;
 	}
 	/*shader->uniform("image", 0); // todo: rm this?
 	if (opts._targetImg != nullptr) {
 		my_assert(opts._targetImg->getInternalFormat() == GL_R32F);
 		glBindImageTexture(0, opts._targetImg->getId(), 0, GL_FALSE, 0, GL_READ_WRITE, opts._targetImg->getInternalFormat());
 	}*/
-	auto srcArea = opts._area;
-	if (srcArea == Area::zero()) {
-		srcArea = tex0->getBounds();
-	}
-	tex0->setTopDown(true);
-	Rectf texRect = tex0->getAreaTexCoords(srcArea);
-	tex0->setTopDown(false);
-	shader->uniform("uTexCoordOffset", texRect.getUpperLeft());
-	shader->uniform("uTexCoordScale", texRect.getSize());
 
-	glUseProgram(shader->getHandle()); // we did this further up, but the ->uniform calls have messed it up
+	glUseProgram(shader->getHandle()); // todo del this, it's unnecessary
 
 	if (opts._enableResult) {
 		beginRTT(results);
@@ -361,4 +328,20 @@ GpuScope::~GpuScope() {
 ShadeOpts::ShadeOpts() {
 	//_ifmt=GL_RGBA16F;
 	_scaleX = _scaleY = 1.0f;
+}
+
+void ShadeOpts::setUniform(int location, float const& val) {
+	glUniform1f(location, val);
+}
+
+void ShadeOpts::setUniform(int location, vec2 const& val) {
+	glUniform2f(location, val.x, val.y);
+}
+
+void ShadeOpts::setUniform(int location, ivec2 const& val) {
+	glUniform2i(location, val.x, val.y);
+}
+
+void ShadeOpts::setUniform(int location, int const& val) {
+	glUniform1i(location, val);
 }
